@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flappy bird</title>
+    <link rel="icon" href="bird.png" />
+    <style>
+      .World {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="World" width="700" height="500" style="display: flex; justify-content: center; align-items: center; border: 1px solid black"></canvas>
+
+    <script>
+      // Inisialisasi Canvas
+      let canvas = document.getElementById('World');
+      let context = canvas.getContext('2d');
+
+      //   Import Assets
+      let birdMid = new Image();
+      birdMid.src = 'bird.png';
+
+      let birdUp = new Image();
+      birdUp.src = 'bird-up.png';
+
+      let tuwing = new Audio();
+      tuwing.src = 'tuwing.mp3';
+      tuwing.load();
+
+      let hit = new Audio();
+      hit.src = 'hit.mp3';
+      hit.load();
+
+      let point = new Audio();
+      point.src = 'point.mp3';
+      point.load();
+
+      //   State
+      let g = 0;
+      let xBird = 0;
+      let yBird = canvas.height / 2 - 100;
+      let wBird = 45;
+      let hBird = 40;
+      let score = 0;
+      let melewatiPipa = false;
+
+      context.font = '35px Arial';
+      context.fillStyle = 'black';
+
+      window.addEventListener('keydown', function () {
+        if (event.keyCode == 32) {
+          g = g - 15;
+
+          tuwing.pause();
+          tuwing.currentTime = 0;
+          tuwing.play();
+        }
+      });
+
+      let lebarPipa = 50;
+      let batasAman = 150;
+      let tinggiPipaAtas = 100;
+      let tinggiPipaBawah = canvas.height - batasAman - tinggiPipaAtas;
+      let kecepatanPipa = 5;
+      let xPipa = canvas.width - lebarPipa;
+      let yPipaAtas = 0;
+      let yPipaBawah = tinggiPipaAtas + batasAman;
+
+      //   Membuat FPS
+      window.setInterval(function () {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        g = g + 1;
+
+        context.drawImage(birdMid, xBird, yBird, wBird, hBird);
+
+        yBird = yBird + g;
+
+        hit.pause();
+        hit.currentTime = 0;
+        hit.play();
+
+        if (yBird >= canvas.height) {
+          gameOver();
+        }
+        if (yBird < 0) {
+          yBird = 0;
+          g = 0;
+        }
+
+        xPipa = xPipa - kecepatanPipa;
+
+        // Pipa Atas
+        context.fillStyle = '#1de051';
+        context.fillRect(xPipa, 0, lebarPipa, 100);
+        context.fillStyle = 'black';
+        context.strokeRect(xPipa, 0, lebarPipa, 100);
+
+        // Pipa Bawah
+        context.fillStyle = '#1de051';
+        context.fillRect(xPipa, yPipaBawah, lebarPipa, tinggiPipaBawah);
+        context.fillStyle = 'black';
+        context.strokeRect(xPipa, yPipaBawah, lebarPipa, tinggiPipaBawah);
+
+        if (xBird + wBird >= xPipa && xBird <= xPipa + lebarPipa && (yBird + 10 <= tinggiPipaAtas || yBird + (hBird - 20) >= yPipaBawah)) {
+          gameOver();
+        } else if (xBird > xPipa + lebarPipa - 5 && !melewatiPipa) {
+          score++;
+          melewatiPipa = true;
+
+          point.pause();
+          point.currentTime = 0;
+          point.play();
+        }
+
+        context.fillText('Score: ' + score, 15, 40);
+      }, 1000 / 30);
+
+      function gameOver() {
+        alert('Game Over');
+
+        g = 0;
+        xBird = 0;
+        yBird = canvas.height / 2 - 100;
+        wBird = 45;
+        hBird = 40;
+        xPipa = canvas.width - lebarPipa;
+        score = 0;
+        melewatiPipa = false;
+      }
+    </script>
+  </body>
+</html>
